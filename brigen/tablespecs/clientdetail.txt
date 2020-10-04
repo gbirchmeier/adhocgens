@@ -1,0 +1,7 @@
+table: ClientDetails
+item: ClientDetail
+PK: ClientDetailId
+EmployerTaxId : char(10) : ER_TAX_ID
+PlanCategoryCode : varchar(256) : ER_Plan
+Amount : decimal(19,4) : Amount
+PlanEndDate : date : PYG_End
