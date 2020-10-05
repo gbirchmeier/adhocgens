@@ -152,7 +152,7 @@ namespace koala.UnitTests.FileParsers
             Assert.AreEqual(DateTimeOffset.MinValue, i1.UploadDateTime);
             Assert.IsNull(i1.SoftDeletedTime);
 
-            #{'vvvvvvvvvvvvvvv DELETE THIS LINE AND BELOW vvvvvvvvvvvvv' if filetable.attributes.count(&:is_optional) < 1}
+#{'vvvvvvvvvvvvvvv DELETE THIS LINE AND BELOW vvvvvvvvvvvvv' if filetable.attributes.count(&:is_optional) < 1}
             // SECOND ITEM - everything that can be null is null
             var i2 = #{filetable.table.downcase}[1];
             #{emit_nulls_assertions()}
