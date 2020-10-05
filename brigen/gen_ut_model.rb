@@ -9,6 +9,7 @@ def emit_att_init(filetable)
   rv = []
   filetable.attributes.each do |att|
     counter += 1
+    counter -= 9 if > 10
     val = nil
     expect = nil
 
