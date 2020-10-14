@@ -149,7 +149,7 @@ namespace koala.UnitTests.FileParsers
             Assert.AreEqual("#{filetable.table.downcase}.csv", i1.InputFilename);
             Assert.AreEqual(new DateTime(2020, 6, 7), i1.InputFileDate);
             Assert.AreEqual("10/11/2020 12:30:00 +00:00", i1.FileLastChangedDateTime.Value.ToString(CultureInfo.InvariantCulture));
-            Assert.AreEqual(DateTimeOffset.MinValue, i1.UploadDateTime);
+            Assert.Less(DateTimeOffset.MinValue, i1.UploadDateTime);
             Assert.IsNull(i1.SoftDeletedTime);
 
 #{'vvvvvvvvvvvvvvv DELETE THIS LINE AND BELOW vvvvvvvvvvvvv' if filetable.attributes.count(&:is_optional) < 1}
@@ -160,7 +160,7 @@ namespace koala.UnitTests.FileParsers
             Assert.AreEqual("#{filetable.table.downcase}.csv", i2.InputFilename);
             Assert.AreEqual(new DateTime(2020, 6, 7), i2.InputFileDate);
             Assert.AreEqual("10/11/2020 12:30:00 +00:00", i2.FileLastChangedDateTime.Value.ToString(CultureInfo.InvariantCulture));
-            Assert.AreEqual(DateTimeOffset.MinValue, i2.UploadDateTime);
+            Assert.Less(DateTimeOffset.MinValue, i2.UploadDateTime);
             Assert.IsNull(i2.SoftDeletedTime);
         }
     }
