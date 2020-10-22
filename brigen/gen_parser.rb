@@ -5,6 +5,8 @@ filetable = FileTable.new(ARGV.first)
 def emit_attributes(filetable)
   rv = []
   filetable.attributes.each do |att|
+    next if att.colheader=='NOT-PARSED'
+
     if att.dbtype == 'MONEY'
       raise 'nullable money not supported yet' if att.is_optional
       rv << "#{att.name} = GetMoney(record, \"#{att.colheader}\"),"

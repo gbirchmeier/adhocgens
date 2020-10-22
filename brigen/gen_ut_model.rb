@@ -15,7 +15,13 @@ def emit_att_init(filetable)
 
     case att.cstype
       when 'string'
-        val = expect = "\"#{att.name.downcase}-#{counter}\""
+        if att.name.downcase.include?('taxid')
+          val = expect = "\"taxid-#{counter}\""
+        elsif att.name.downcase.include?('middleinit')
+          val = expect = '"I"'
+        else
+          val = expect = "\"#{att.name.downcase}-#{counter}\""
+        end
       when 'decimal'
         val = expect = "#{counter*100}.#{counter}#{counter}m"
       when 'int'

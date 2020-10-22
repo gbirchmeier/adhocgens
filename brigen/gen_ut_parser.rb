@@ -10,6 +10,8 @@ def emit_no_nulls_row(filetable)
   counter = 0
   values = []
   filetable.attributes.each do |att|
+    next if att.colheader=='NOT-PARSED'
+
     counter += 1
     counter -= 9 if counter > 9
     val = nil
@@ -17,7 +19,13 @@ def emit_no_nulls_row(filetable)
 
     case att.cstype
       when 'string'
-        val = "#{att.name.downcase}-#{counter}"
+        if att.name.downcase.include?('taxid')
+          val = "taxid-#{counter}"
+        elsif att.name.downcase.include?('middleinit')
+          val = 'I'
+        else
+          val = "#{att.name.downcase}-#{counter}"
+        end
         expect = "\"#{val}\""
       when 'decimal'
         number = "#{counter*100}.#{counter}#{counter}"
@@ -46,6 +54,8 @@ def emit_with_nulls_row(filetable)
   counter = 5
   values = []
   filetable.attributes.each do |att|
+    next if att.colheader=='NOT-PARSED'
+
     if att.is_optional
       values << ''
       @nulls_expectations[att.name] = 'null'
@@ -59,7 +69,13 @@ def emit_with_nulls_row(filetable)
 
     case att.cstype
       when 'string'
-        val = "#{att.name.downcase}-#{counter}"
+        if att.name.downcase.include?('taxid')
+          val = "taxid-#{counter}"
+        elsif att.name.downcase.include?('middleinit')
+          val = 'I'
+        else
+          val = "#{att.name.downcase}-#{counter}"
+        end
         expect = "\"#{val}\""
       when 'decimal'
         number = "#{counter*100}.#{counter}#{counter}"
@@ -130,7 +146,7 @@ namespace koala.UnitTests.FileParsers
         public void ReadStream()
         {
             var csv = new List<string>();
-            csv.Add("#{filetable.attributes.collect(&:colheader).join(", ")}");
+            csv.Add("#{filetable.attributes.select{|att| att.colheader != 'NOT-PARSED'}.collect(&:colheader).join(", ")}");
             csv.Add("#{emit_no_nulls_row(filetable)}");
             csv.Add("#{emit_with_nulls_row(filetable)}");
 
