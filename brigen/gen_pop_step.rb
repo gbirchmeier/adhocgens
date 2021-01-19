@@ -2,6 +2,20 @@ require './file_table'
 
 filetable = FileTable.new(ARGV.first)
 
+def emit_column_checks(filetable)
+  required_atts = filetable.attributes.find_all {|att| !att.is_optional }
+  return '' if required_atts.empty?
+
+  rv = ["var headers = value.Header.ToList();"]
+  required_atts.each do |att|
+    rv << "if (!headers.Contains(\"#{att.name}\"))"
+    rv << "    throw new Exception(\"Missing required column [#{att.name}]\");";
+  end
+
+  indent = ' '*12
+  indent + rv.join("\n#{indent}") + "\n"
+end
+
 def emit_assignments(filetable)
   rv = []
   filetable.attributes.each do |att|
@@ -10,15 +24,15 @@ def emit_assignments(filetable)
         'String.IsNullOrWhiteSpace(foo) ? null : foo'
       when 'decimal'
         att.is_optional ?
-          'String.IsNullOrWhiteSpace(foo) ? null : decimal.Parse(foo)' :
+          'String.IsNullOrWhiteSpace(foo) ? (decimal?)null : decimal.Parse(foo)' :
           'decimal.Parse(foo)'
       when 'int'
         att.is_optional ?
-          'String.IsNullOrWhiteSpace(foo) ? null : int.Parse(foo)' :
+          'String.IsNullOrWhiteSpace(foo) ? (int?)null : int.Parse(foo)' :
           'int.Parse(foo)'
       when 'byte'
         att.is_optional ?
-          'String.IsNullOrWhiteSpace(foo) ? null : byte.Parse(foo)' :
+          'String.IsNullOrWhiteSpace(foo) ? (byte?)null : byte.Parse(foo)' :
           'byte.Parse(foo)'
       when 'DateTime'
         att.is_optional ?
@@ -39,6 +53,7 @@ content = <<CONTENTEND
         [Given(@"this test populates the #{filetable.table} table with:")]
         public void Populate#{filetable.table}(Table value)
         {
+#{emit_column_checks(filetable)}
             var obs = new List<koala.FileModels.#{filetable.item}>();
             foreach (TableRow row in value.Rows)
             {
@@ -54,7 +69,7 @@ content = <<CONTENTEND
                 obs.Add(ob);
             }
 
-            using(var db = new koala.Reports.SummaryContext(false))
+            using (var db = new koala.Reports.SummaryContext(false))
             {
                 db.AddRange(obs);
                 db.SaveChanges();

@@ -31,10 +31,6 @@ class FileTable
   end
 
   def read_attribute(col_name, db_data_type, csv_col_header, is_optional)
-    if db_data_type.start_with?('decimal') && col_name.downcase.include?('amount')
-      db_data_type = 'Money'
-    end
-
     cstype = get_cs_type(db_data_type)
 
     @attributes << Attribute.new(col_name, db_data_type.upcase, cstype, csv_col_header, is_optional)
@@ -44,7 +40,7 @@ class FileTable
     if db_data_type.start_with?('varchar') || db_data_type.start_with?('char')
       return 'string'
     end
-    if db_data_type.start_with?('decimal') || db_data_type.downcase=='money'
+    if db_data_type.start_with?('decimal')
       return 'decimal'
     end
     return 'int' if db_data_type=='int'

@@ -30,7 +30,7 @@ def emit_no_nulls_row(filetable)
       when 'decimal'
         number = "#{counter*100}.#{counter}#{counter}"
         expect = number + "m"
-        val = att.dbtype=='MONEY' ? "$#{number}" : expect
+        val = att.name.downcase.include?('amount') ? "$#{number}" : number
       when 'int'
         val = expect = (counter*100).to_s
       when 'byte'
@@ -80,7 +80,7 @@ def emit_with_nulls_row(filetable)
       when 'decimal'
         number = "#{counter*100}.#{counter}#{counter}"
         expect = number + "m"
-        val = att.dbtype=='MONEY' ? "$#{number}" : expect
+        val = att.name.downcase.include?('amount') ? "$#{number}" : number
       when 'int'
         val = expect = (counter*100).to_s
       when 'byte'

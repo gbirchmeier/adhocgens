@@ -2,16 +2,18 @@ require './file_table'
 
 filetable = FileTable.new(ARGV.first)
 
+def emit_col_headers_list(filetable)
+  quoted_headers = filetable.attributes.collect {|att| "\"#{att.colheader}\""}
+  indent = '    ' * 5
+  indent + quoted_headers.join(",\n" + indent)
+end
+
 def emit_attributes(filetable)
   rv = []
   filetable.attributes.each do |att|
     next if att.colheader=='NOT-PARSED'
 
-    if att.dbtype == 'MONEY'
-      raise 'nullable money not supported yet' if att.is_optional
-      rv << "#{att.name} = GetMoney(record, \"#{att.colheader}\"),"
-
-    elsif att.dbtype == 'DATE'
+    if att.dbtype == 'DATE'
       rv << "#{att.name} = Get#{'Nullable' if att.is_optional}Date(record, \"#{att.colheader}\"),"
 
     elsif att.cstype == 'string'
@@ -24,6 +26,9 @@ def emit_attributes(filetable)
     elsif att.cstype == 'byte'
       raise 'nullable int not supported yet' if att.is_optional
       rv << "#{att.name} = GetByte(record, \"#{att.colheader}\"),"
+
+    elsif att.cstype == 'decimal'
+      rv << "#{att.name} = Get#{'Nullable' if att.is_optional}Decimal(record, \"#{att.colheader}\"),"
 
     else
       raise "unsupported attribute: #{att.inspect}"
@@ -43,8 +48,19 @@ namespace koala.FileParsers
 {
     public class #{filetable.table}FileParser : AbstractFileParserBase<#{filetable.item}>
     {
+        public override string[] ColumnHeaders
+        {
+            get
+            {
+                return new string[]
+                {
+#{emit_col_headers_list(filetable)}
+                };
+            }
+        }
+
         public override #{filetable.item} BuildFileModelObject(
-            Dictionary<string,string> record,
+            Dictionary<string, string> record,
             string fileName,
             DateTime? fileDate,
             DateTime? fileChanged)

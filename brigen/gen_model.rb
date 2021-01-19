@@ -5,11 +5,7 @@ filetable = FileTable.new(ARGV.first)
 def emit_attributes(filetable)
   rv = []
   filetable.attributes.each do |att|
-    if att.dbtype == 'MONEY'
-      rv << "[Column(TypeName = \"Money\")]"
-      rv << "public decimal#{'?' if att.is_optional} #{att.name} { get; set; }"
-
-    elsif att.dbtype == 'DATE'
+    if att.dbtype == 'DATE'
       rv << "private DateTime#{'?' if att.is_optional} _#{att.name};"
       rv << "[Column(TypeName = \"Date\")]"
       rv << "public DateTime#{'?' if att.is_optional} #{att.name}"
@@ -28,6 +24,10 @@ def emit_attributes(filetable)
 
     elsif att.cstype == 'byte'
       rv << "public byte#{'?' if att.is_optional} #{att.name} { get; set; }"
+
+    elsif att.cstype == 'decimal'
+      rv << "[Column(TypeName = \"#{att.dbtype}\")]"
+      rv << "public decimal#{'?' if att.is_optional} #{att.name} { get; set; }"
 
     else
       raise "unsupported attribute: #{att.inspect}"
